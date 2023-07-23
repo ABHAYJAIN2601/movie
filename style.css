@@ -171,11 +171,12 @@ body {
 }
 
 .movie-list {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+ display: grid;
+ display: grid;
+ grid-template-columns: 1fr 1fr;
   height: 90%;
   overflow-y: scroll;
+  gap:10px
   /* transform: translateX(0); */
   /* transition: all 1s ease-in-out;
     /* transition: all 1s ease-in-out; */
@@ -186,8 +187,8 @@ body {
   /* position: relative; */
   display: flex;
   flex-direction: column;
-  width: 50%;
-  height: 700px;
+  width: 90%;
+  height: 500px;
   padding: 10px;
   /* background-color: aliceblue; */
   /* display: flex; */
@@ -205,16 +206,39 @@ body {
   display: flex;
   justify-content: flex-end;
 }
-
-.movie-list-item-img {
+.first-section{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  font-size: 18px;
+  font-weight: bold;
+}
+.movie-details-img{
   transition: all 1s ease-in-out;
   width: 100%;
-  height: 200px;
+  height: 500px;
   object-fit: cover;
   border-radius: 20px;
   margin: 10px;
 }
-
+.movie-list-item-img {
+  transition: all 1s ease-in-out;
+  width: 100%;
+  height: 70%;
+  object-fit: cover;
+  border-radius: 20px;
+  margin: 10px;
+}
+.movie-details-item{
+  /* color: black; */
+}
+.rating-box{
+  margin: 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
 .movie-list-item-title {
   /* background-color: #333; */
   padding: 0 10px;
@@ -224,9 +248,20 @@ body {
   /* position: absolute;
     top: 10%;
     left: 50px; */
-
 }
-
+.detail-section{
+  display: flex;
+  flex-direction: row;
+  color: white;
+  margin: 10px;
+}
+.detail-section-label{
+  display: flex;
+  flex-direction: row;
+  color: #4262e1;
+  font-weight: bold;
+  margin-right: 5px;
+}
 .movie-list-item-desc {
   background-color: #333;
   padding: 10px;
@@ -327,15 +362,23 @@ body {
 
 /* Style for the model content */
 .model-content {
-  background-color: white;
+
+  background-color: rgb(33, 33, 33);
+  color: #fff;
+  font-size: 16px;
+  box-shadow: 9px 21px 30px -19px rgba(0, 0, 0, 0.63);
+
+  /* background-color: white; */
   padding: 20px;
   border-radius: 5px;
   width: 60%;
   max-width: 500px;
+  height: 81%;  
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  overflow-y: scroll;
 }
 
 .rating-box .stars {

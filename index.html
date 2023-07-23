@@ -24,8 +24,9 @@
         <div id="model" class="model">
             <div class="model-content">
                 <div id="model-movie-content"></div>
-                <button onclick="closeModel()">Close</button>
+               
             </div>
+            <button onclick="closeModel()">Close</button>
         </div>
         <div class="pagination" id="pagination"></div>
     </div>
@@ -79,22 +80,53 @@
         await getMovies(apiUrl);
         var model = document.getElementById("model-movie-content");
         model.innerHTML = '';
-        model.innerHTML = `<div class="movie-list-item">
-                            <img class="movie-list-item-img" src=${data.Poster == 'N/A' ? 'video-camera.png' : data.Poster} alt=""/>
-                            <p class="movie-list--title">${data.Title}</p>
-                            <p class="movie-list--title">${data.Type}</p>
-                            <p class="movie-list--title">${data.Awards}</p>
-                            <p class="movie-list--title">${data.Country}</p>
-                            <p class="movie-list--title">${data.Director}</p>
-                            <p class="movie-list--title">${data.Language}</p>
-                            <p class="movie-list--title">${data.Genre}</p>
-                            <p class="movie-list--title">${data.Plot}</p>
-                            <p class="movie-list--title">${data.Released}</p>
-                            <p class="movie-list--title">${data.Runtime}</p>
-                            <p class="movie-list--title">${data.imdbRating}</p>
-                            <p class="movie-list--title">${data.imdbVotes}</p>
-                            <p class="movie-list--title">${data.Year}</p>
-                            <p class="movie-list--title">${data.Writer}</p>
+        model.innerHTML = `<div class="movie-details-item">
+            <p class="movie-details--title">${data.Title}</p>
+                            <img class="movie-details-img" src=${data.Poster == 'N/A' ? 'video-camera.png' : data.Poster} alt=""/>
+                            <div class='first-section'>
+                                <p class="movie-details-runtime">${data.Runtime}</p>
+                            <p class="movie-details-rating">${data.imdbRating}</p>
+                            <p class="movie-details-votes">${data.imdbVotes}</p>
+                            <p class="movie-details-year">${data.Year}</p>
+                                </div>
+                            <span class='detail-section'>
+                                
+                                <p class="movie-details-item">${data.Plot}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Genre</span>
+                                <p class="movie-details-item">${data.Genre}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Actors</span>
+                                <p class="movie-details-item">${data.Actors}</p>
+                            </span>
+
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Awards</span>
+                                <p class="movie-details-item">${data.Awards}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Country</span>
+                                <p class="movie-details-item">${data.Country}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Director</span>
+                                <p class="movie-details-item">${data.Director}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Language</span>
+                                <p class="movie-details-item">${data.Language}</p>
+                            </span>
+                            <span class='detail-section'>
+                                <span class='detail-section-label'>Released</span>
+                                <p class="movie-details-item">${data.Released}</p>
+                            </span>
+
+                           <span class='detail-section'>
+                                <span class='detail-section-label'>Writer</span>
+                                <p class="movie-details-item">${data.Writer}</p>
+                            </span>
                             <div class="rating-box">
       <header>How was your experience?</header>
       <div class="stars">
