@@ -1,150 +1,250 @@
+let data = JSON.parse(localStorage.getItem("data")) || [];;
+let userData = JSON.parse(localStorage.getItem("userData")) || [];;
+let movieDetails = JSON.parse(localStorage.getItem("movieDetails")) || null;;
+const dataPanel = document.getElementById("movie-list");
+const searchBtn = document.getElementById("search-button");
+const searchInput = document.getElementById("search");
 
-    // async function get() {
-    //      const getMovies  = await getData();
-    // saveTodos(getMovies)
-    // }
-   
-    // console.log(getMovies);
+function openModel() {
+    var model = document.getElementById("model");
+    model.style.display = "block";
+}
 
-    // fetch
-    //     .get(INDEX_URL)
-    //     .then(response => {
-    //         data.push(...response.data.results);
-    //         getTotalPages(data);
-    //         // displayDataList(data)
-    //         getPageData(1, data);
-    //     })
-    //     .catch(err => console.log(err));
+// Function to close the model
+function closeModel() {
+    var model = document.getElementById("model");
+    model.style.display = "none";
+}
+function saveData(data) {
+    localStorage.setItem("data", JSON.stringify(data));
+}
+function saveUserData(data) {
+    localStorage.setItem("userData", JSON.stringify(userData));
+}
+function saveMovieData(data) {
+    localStorage.setItem("movieDetails", JSON.stringify(movieDetails));
+}
+let currentPage = 1;
+const moviesPerPage = 10;
+async function getMoviesDetails(id) {
+  
+    const apiUrl = `https://www.omdbapi.com/?apikey=bc283c3a&i=${id.id}`;
+    await getMovieById(apiUrl);
+    var model = document.getElementById("model-movie-content");
+    model.innerHTML = '';
+    model.innerHTML = `<div class="movie-details-item">
+    <p class="movie-details--title">${movieDetails.Title}</p>
+    <img class="movie-details-img" src=${movieDetails.Poster == 'N/A' ? 'video-camera.png' : movieDetails.Poster} alt=""/>
+    <div class='first-section'>
+       <p class="movie-details-runtime">Duration ${movieDetails.Runtime}</p>
+       <p class="movie-details-rating">Rating ${movieDetails.imdbRating}</p>
+       <p class="movie-details-votes">Votes ${movieDetails.imdbVotes}</p>
+       <p class="movie-details-year">Year ${movieDetails.Year}</p>
+    </div>
+    <span class='detail-section'>
+       <p class="movie-details-item">${movieDetails.Plot}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Genre</span>
+       <p class="movie-details-item">${movieDetails.Genre}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Actors</span>
+       <p class="movie-details-item">${movieDetails.Actors}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Awards</span>
+       <p class="movie-details-item">${movieDetails.Awards}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Country</span>
+       <p class="movie-details-item">${movieDetails.Country}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Director</span>
+       <p class="movie-details-item">${movieDetails.Director}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Language</span>
+       <p class="movie-details-item">${movieDetails.Language}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Released</span>
+       <p class="movie-details-item">${movieDetails.Released}</p>
+    </span>
+    <span class='detail-section'>
+       <span class='detail-section-label'>Writer</span>
+       <p class="movie-details-item">${movieDetails.Writer}</p>
+    </span>
+    
+    <div class='comment-section'>
+    <input id='rate-input' class='comment-input' />
+    <button class="movie-list-item-button" id=${movieDetails.imdbID
+    } onclick="addRate(${movieDetails.imdbID})">Rate Us</button>
+    </div>
 
-    // // listen to data panel
-    // dataPanel.addEventListener("click", event => {
-    //     if (event.target.matches(".btn-show-movie")) {
-    //         showMovie(event.target.dataset.id);
-    //     } else if (event.target.matches(".btn-add-favorite")) {
-    //         console.log(event.target.dataset.id);
-    //         addFavoriteItem(event.target.dataset.id);
-    //     }
-    // });
+    
+    <div class="rating-box">
+       <header>How was your experience?</header>
+       <span id='user-rate' class='user-rate'/>
+      
+    </div>
+    <div class='comment-section'> 
+       <input id='comment-input' class='comment-input'></input>
+       <button class="movie-list-item-button" id=${movieDetails.imdbID
+        } onclick="addComment(${movieDetails.imdbID})">Comment</button>
+    </div>
+    <span id='comment-section' class='comment-div'></span>
+ </div>`;
+    renderRate(movieDetails.imdbID);
+    renderComment(movieDetails.imdbID);
 
-    // // listen to search btn click event
-    // searchBtn.addEventListener("click", event => {
-    //     event.preventDefault();
-    //     console.log("click!");
 
-    //     let results = [];
-    //     const regex = new RegExp(searchInput.value, "i");
+}
+async function displayMoviesForPage(pageNumber) {
+    const startIndex = (pageNumber - 1) * moviesPerPage;
+    const endIndex = startIndex + moviesPerPage;
+    let movieName = searchInput.value
+    if (movieName == '')
+        movieName = 'harry'
+    const apiUrl = `https://www.omdbapi.com/?apikey=bc283c3a&type=movie&s=${movieName}&page=${pageNumber}`;
+    await getMovies(apiUrl);
+    displayDataListModel(data);
+    updatePaginationButtons(pageNumber);
+}
 
-    //     results = data.filter(movie => movie.title.match(regex));
-    //     console.log(results);
-    //     // displayDataList(results)
-    //     getTotalPages(results);
-    //     getPageData(1, results);
-    // });
+function updatePaginationButtons(currentPage) {
+    const totalPages = Math.ceil(data.totalResults / moviesPerPage);
 
-    // // listen to pagination click event
-    // pagination.addEventListener("click", event => {
-    //     console.log(event.target.dataset.page);
-    //     if (event.target.matches(".btn-add-favorite")) {
-    //         getPageData(event.target.dataset.page);
-    //     }
-    // });
+    const paginationDiv = document.getElementById('pagination');
+    paginationDiv.innerHTML = '';
 
-    // //listen to viewbox
-    // listModel.addEventListener("click", event => {
-    //     if (event.target.matches("#btn-listModel")) {
-    //         displayDataListModel(data);
-    //     }
-    // });
+    if (currentPage > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.innerText = 'Previous';
+        prevButton.addEventListener('click', () => {
+            currentPage--;
+            displayMoviesForPage(currentPage);
+        });
+        paginationDiv.appendChild(prevButton);
+    }
 
-    // function getTotalPages(data) {
-    //     let totalPages = Math.ceil(data.length / ITEM_PER_PAGE) || 1;
-    //     let pageItemContent = "";
-    //     for (let i = 0; i < totalPages; i++) {
-    //         pageItemContent += `
-    //       <li class="page-item">
-    //         <a class="page-link" href="javascript:;" data-page="${i + 1}">${i +
-    //             1}</a>
-    //       </li>
-    //     `;
-    //     }
-    //     pagination.innerHTML = pageItemContent;
-    // }
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.innerText = i;
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            displayMoviesForPage(currentPage);
+        });
+        paginationDiv.appendChild(pageButton);
+    }
 
-    // function getPageData(pageNum, data) {
-    //     paginationData = data || paginationData;
-    //     let offset = (pageNum - 1) * ITEM_PER_PAGE;
-    //     let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE);
-    //     displayDataList(pageData);
-    // }
+    if (currentPage < totalPages) {
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Next';
+        nextButton.addEventListener('click', () => {
+            currentPage++;
+            displayMoviesForPage(currentPage);
+        });
+        paginationDiv.appendChild(nextButton);
+    }
+}
+async function getMovieById(url) {
+    const resp = await fetch(url);
+    const respData = await resp.json();
+    movieDetails = respData;
+    saveMovieData(respData);
+}
+async function getMovies(url) {
+    const resp = await fetch(url);
+    const respData = await resp.json();
+    data = respData;
+    saveData(respData);
+}
+function renderRate(imdbID) {
+    console.log('hey',imdbID)
+    const commentDiv = document.getElementById('user-rate');
+    commentDiv.innerHTML = '';
+    const index = userData.findIndex(x => x.imdbID === imdbID);
 
-    // function getPageDatalistModel(pageNum, data) {
-    //     paginationData = data || paginationData;
-    //     let offset = (pageNum - 1) * ITEM_PER_PAGE;
-    //     let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE);
-    //     displayDataListModel(pageData);
-    // }
+    console.log(index)
+    if (index != -1) {
+        // console.log(userData[index].comments)
+        commentDiv.innerText = userData[index].rate;
+    }
+    // openModel();
+}
+function renderComment(imdbID) {
 
-    // function displayDataList(data) {
-    //     let htmlContent = "";
-    //     data.forEach(function (item, index) {
-    //         htmlContent += `
-    //       <div class="col-sm-3">
-    //         <div class="card mb-2">
-    //           <img class="card-img-top " src="${POSTER_URL}${item.image
-    //             }" alt="Card image cap">
-    //           <div class="card-body movie-item-body">
-    //             <h6 class="card-title">${item.title}</h5>
-    //           </div>
-    //           <!-- "More" button -->
-    //           <div class="card-footer">
-    //             <button class="btn btn-primary btn-show-movie" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id
-    //             }">More</button>
-    //               <!-- favorite button -->
-    //             <button class="btn btn-info btn-add-favorite" data-id="${item.id
-    //             }">+</button>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     `;
-    //     });
-    //     dataPanel.innerHTML = htmlContent;
-    // }
+    const commentDiv = document.getElementById('comment-section');
+    commentDiv.innerHTML = '';
+    const index = userData.findIndex(x => x.imdbID === imdbID);
 
-    // function showMovie(id) {
-    //     // get elements
-    //     const modalTitle = document.getElementById("show-movie-title");
-    //     const modalImage = document.getElementById("show-movie-image");
-    //     const modalDate = document.getElementById("show-movie-date");
-    //     const modalDescription = document.getElementById("show-movie-description");
+    if (index != -1) {
+        userData[index].comments.forEach((comment) => {
+            const commentText = document.createElement('p');
+            commentText.classList = 'comment';
+            commentText.innerText = comment;
+            commentDiv.appendChild(commentText);
+        });
+    }
+    openModel();
+};
+function addComment(imdbID) {
+    const commentText = document.getElementById('comment-input');
 
-    //     // set request url
-    //     const url = INDEX_URL + id;
-    //     console.log(url);
-
-    //     // send request to show api
-    //     axios.get(url).then(response => {
-    //         const data = response.data.results;
-    //         console.log(data);
-
-    //         // insert data into modal ui
-    //         modalTitle.textContent = data.title;
-    //         modalImage.innerHTML = `<img src="${POSTER_URL}${data.image
-    //             }" class="img-fluid" alt="Responsive image">`;
-    //         modalDate.textContent = `release at : ${data.release_date}`;
-    //         modalDescription.textContent = `${data.description}`;
-    //     });
-    // }
-
-    // function addFavoriteItem(id) {
-    //     const list = JSON.parse(localStorage.getItem("favoriteMovies")) || [];
-    //     const movie = data.find(item => item.id === Number(id));
-
-    //     if (list.some(item => item.id === Number(id))) {
-    //         alert(`${movie.title} is already in your favorite list.`);
-    //     } else {
-    //         list.push(movie);
-    //         alert(`Added ${movie.title} to your favorite list!`);
-    //     }
-    //     localStorage.setItem("favoriteMovies", JSON.stringify(list));
-    // }
-
+    const index = userData.findIndex(x => x.imdbID === imdbID.id);
+    if (index != -1) {
+        userData[index].comments.push(commentText.value)
+    } else {
+        let obj = {};
+        obj.imdbID = imdbID.id;
+        obj.rate = 0;
+        obj.comments = [commentText.value];
+        userData.push(obj);
+    }
+    commentText.value = '';
+    saveUserData();
+    renderComment(imdbID.id)
+}
+function addRate(imdbID) {
+    const rateText = document.getElementById('rate-input');
+    console.log(rateText.value, imdbID);
+    const index = userData.findIndex(x => x.imdbID === imdbID);
+    if (index != -1) {
+        userData[index].rate = rateText.value;
+    } else {
+        let obj = {};
+        obj.imdbID = imdbID.id;
+        obj.rate = rateText.value;
+        obj.comments = [];
+        userData.push(obj);
+    }
+    rateText.value = '';
+    saveUserData();
+    renderRate(imdbID)
+}
+function displayDataListModel(dataArray) {
+    let htmlContent = "";
+    dataArray.Search.forEach((item, index) => {
+        // console.log(item);
+        htmlContent += `
+        <div class="movie-list-item">
+                        <img class="movie-list-item-img" src=${item.Poster == 'N/A' ? 'video-camera.png' : item.Poster} alt=""/>
+                        <p class="movie-list-item-title">${item.Title}</p>
+                       
+                        <button class="movie-list-item-button" id=${item.imdbID
+            } onclick="getMoviesDetails(${item.imdbID})">Details</button>
+        
+</div>
+    
+    `;
+    });
+    dataPanel.innerHTML = htmlContent;
+}
+searchBtn.addEventListener("click", event => {
+    event.preventDefault();
+    if (searchInput.value != '')
+        displayMoviesForPage(1);
+});
+displayMoviesForPage(1);
