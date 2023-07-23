@@ -27,7 +27,6 @@ function saveMovieData(data) {
 let currentPage = 1;
 const moviesPerPage = 10;
 async function getMoviesDetails(id) {
-  
     const apiUrl = `https://www.omdbapi.com/?apikey=bc283c3a&i=${id.id}`;
     await getMovieById(apiUrl);
     var model = document.getElementById("model-movie-content");
@@ -79,8 +78,7 @@ async function getMoviesDetails(id) {
     
     <div class='comment-section'>
     <input id='rate-input' class='comment-input' />
-    <button class="movie-list-item-button" id=${movieDetails.imdbID
-    } onclick="addRate(${movieDetails.imdbID})">Rate Us</button>
+    <button class="movie-list-item-button" onclick="addRate(${movieDetails.imdbID})">Rate Us</button>
     </div>
 
     
@@ -91,13 +89,12 @@ async function getMoviesDetails(id) {
     </div>
     <div class='comment-section'> 
        <input id='comment-input' class='comment-input'></input>
-       <button class="movie-list-item-button" id=${movieDetails.imdbID
-        } onclick="addComment(${movieDetails.imdbID})">Comment</button>
+       <button class="movie-list-item-button" onclick="addComment(${movieDetails.imdbID})">Comment</button>
     </div>
     <span id='comment-section' class='comment-div'></span>
  </div>`;
-    renderRate(movieDetails.imdbID);
-    renderComment(movieDetails.imdbID);
+    renderRate(id.id);
+    renderComment(id.id);
 
 
 }
@@ -191,6 +188,7 @@ function renderComment(imdbID) {
     openModel();
 };
 function addComment(imdbID) {
+    console.log(imdbID)
     const commentText = document.getElementById('comment-input');
 
     const index = userData.findIndex(x => x.imdbID === imdbID.id);
@@ -208,9 +206,10 @@ function addComment(imdbID) {
     renderComment(imdbID.id)
 }
 function addRate(imdbID) {
+
     const rateText = document.getElementById('rate-input');
-    console.log(rateText.value, imdbID);
-    const index = userData.findIndex(x => x.imdbID === imdbID);
+    console.log(rateText.value, imdbID.id);
+    const index = userData.findIndex(x => x.imdbID === imdbID.id);
     if (index != -1) {
         userData[index].rate = rateText.value;
     } else {
@@ -222,7 +221,7 @@ function addRate(imdbID) {
     }
     rateText.value = '';
     saveUserData();
-    renderRate(imdbID)
+    renderRate(imdbID.id)
 }
 function displayDataListModel(dataArray) {
     let htmlContent = "";
