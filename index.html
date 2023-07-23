@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Movie List</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+
+</head>
+
+<body>
+    <div class="main-div">
+        <h1>Movie</h1>
+        <div class="search-div">
+            <input class="input" type="text" id="search" placeholder="Search" />
+            <button class="button red" type="button" id="search-button">Search</button>
+        </div>
+       
+        <div class="movie-list-wrapper">
+            <div class="movie-list" id='movie-list'>
+
+            </div>
+        </div>
+        <div id="model" class="model">
+            <div class="model-content">
+                <div id="model-movie-content"></div>
+                <button onclick="closeModel()">Close</button>
+            </div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+</body>
+<script>
+    const stars = document.querySelectorAll(".stars i");
+    // Loop through the "stars" NodeList
+    stars.forEach((star, index1) => {
+        // Add an event listener that runs a function when the "click" event is triggered
+        star.addEventListener("click", () => {
+            const currentStar = index1 + 1;
+            console.log(index1);
+            // Loop through the "stars" NodeList Again
+            stars.forEach((star, index2) => {
+                // Add the "active" class to the clicked star and any stars with a lower index
+                // and remove the "active" class from any stars with a higher index
+                index1 >= index2 ? star.classList.add("active") : star.classList.remove("active");
+            });
+        });
+    });
+   
+    let data = [];
+    let userData = [];
+    const dataPanel = document.getElementById("movie-list");
+    const searchBtn = document.getElementById("search-button");
+    const searchInput = document.getElementById("search");
+
+    function openModel() {
+        var model = document.getElementById("model");
+        model.style.display = "block";
+    }
+
+    // Function to close the model
+    function closeModel() {
+        var model = document.getElementById("model");
+        model.style.display = "none";
+    }
+    function saveTodos(data) {
+        localStorage.setItem("data", JSON.stringify(data));
+    }
+    function saveUserData(data) {
+        localStorage.setItem("userData", JSON.stringify(userData));
+    }
+    // getMovies(BASE_URL);
+    let currentPage = 1;
+    const moviesPerPage = 10;
+    async function getMoviesDetails(id) {
+        console.log(id.id)
+        const apiUrl = `https://www.omdbapi.com/?apikey=bc283c3a&i=${id.id}`;
+        await getMovies(apiUrl);
+        var model = document.getElementById("model-movie-content");
+        model.innerHTML = '';
+        model.innerHTML = `<div class="movie-list-item">
+                            <img class="movie-list-item-img" src=${data.Poster == 'N/A' ? 'video-camera.png' : data.Poster} alt=""/>
+                            <p class="movie-list--title">${data.Title}</p>
+                            <p class="movie-list--title">${data.Type}</p>
+                            <p class="movie-list--title">${data.Awards}</p>
+                            <p class="movie-list--title">${data.Country}</p>
+                            <p class="movie-list--title">${data.Director}</p>
+                            <p class="movie-list--title">${data.Language}</p>
+                            <p class="movie-list--title">${data.Genre}</p>
+                            <p class="movie-list--title">${data.Plot}</p>
+                            <p class="movie-list--title">${data.Released}</p>
+                            <p class="movie-list--title">${data.Runtime}</p>
+                            <p class="movie-list--title">${data.imdbRating}</p>
+                            <p class="movie-list--title">${data.imdbVotes}</p>
+                            <p class="movie-list--title">${data.Year}</p>
+                            <p class="movie-list--title">${data.Writer}</p>
+                            <div class="rating-box">
+      <header>How was your experience?</header>
+      <div class="stars">
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+        <i class="fa-solid fa-star"></i>
+      </div>
+    </div>
+                            <input id='comment-input'></input>
+                            
+                            <button class="movie-list-item-button" idW${data.imdbID
+            } onclick="addComment(${data.imdbID})">Comment</button>
+            <span id='comment-section'></span>
+            
+    </div>`;
+        renderRating(id.id);
+        renderComment(id.id);
+        openModel();
+
+    }
+
+    // Function to fetch and display movies for the current page
+    async function displayMoviesForPage(pageNumber) {
+        // Calculate the start and end indices of movies for the current page
+        const startIndex = (pageNumber - 1) * moviesPerPage;
+        const endIndex = startIndex + moviesPerPage;
+        if (searchInput.value == '')
+            searchInput.value = 'harry'
+        // Fetch movie data from the OMDB API for the current page
+        // Use the API key and appropriate parameters for pagination
+        const apiUrl = `https://www.omdbapi.com/?apikey=bc283c3a&type=movie&s=${searchInput.value}&page=${pageNumber}`;
+        await getMovies(apiUrl);
+        console.log(data)
+        displayDataListModel(data);
+        // Process the fetched data and display movies in the "movieList" section
+        // Example: moviesData.forEach(movie => { /* create HTML elements for each movie */ });
+
+        // Update the pagination section with the appropriate buttons and page numbers
+        updatePaginationButtons(pageNumber);
+    }
+
+    // Function to update the pagination buttons and page numbers
+    function updatePaginationButtons(currentPage) {
+        // Calculate the total number of pages based on the total number of movies
+        // Example: const totalMovies = ... // Get the total number of movies from the fetched data
+        const totalPages = Math.ceil(data.totalResults / moviesPerPage);
+
+        // Update the "pagination" section with the pagination buttons and page numbers
+        const paginationDiv = document.getElementById('pagination');
+        paginationDiv.innerHTML = '';
+
+        // Create and add "Previous" button if not on the first page
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.innerText = 'Previous';
+            prevButton.addEventListener('click', () => {
+                currentPage--;
+                displayMoviesForPage(currentPage);
+            });
+            paginationDiv.appendChild(prevButton);
+        }
+
+        // Create and add page numbers as buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                console.log(currentPage);
+                displayMoviesForPage(currentPage);
+            });
+            paginationDiv.appendChild(pageButton);
+        }
+
+        // Create and add "Next" button if not on the last page
+        if (currentPage < totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.innerText = 'Next';
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                displayMoviesForPage(currentPage);
+            });
+            paginationDiv.appendChild(nextButton);
+        }
+    }
+    async function getMovies(url) {
+        const resp = await fetch(url);
+        const respData = await resp.json();
+        data = respData;
+        await saveTodos(respData);
+    }
+    function renderRating(id) {
+
+    }
+    function renderComment(imdbID) {
+        const commentDiv = document.getElementById('comment-section');
+        commentDiv.innerHTML = '';
+        const index = userData.findIndex(x => x.imdbID === imdbID);
+
+
+
+        if (index != -1) {
+            console.log(userData[index].comments)
+            userData[index].comments.forEach((comment) => {
+                const commentText = document.createElement('p');
+                commentText.innerText = comment;
+                commentDiv.appendChild(commentText);
+            });
+        }
+    };
+    function addComment(imdbID) {
+        const commentText = document.getElementById('comment-input');
+        console.log(commentText.value, imdbID.id);
+        const index = userData.findIndex(x => x.imdbID === imdbID.id);
+        if (index != -1) {
+            userData[index].comments.push(commentText.value)
+        } else {
+            let obj = {};
+            obj.imdbID = imdbID.id;
+            obj.rate = 0;
+            obj.comments = [commentText.value];
+            userData.push(obj);
+        }
+        commentText.value = '';
+        saveUserData();
+        renderComment(imdbID.id)
+    }
+    function displayDataListModel(dataArray) {
+        let htmlContent = "";
+        dataArray.Search.forEach((item, index) => {
+            // console.log(item);
+            htmlContent += `
+            <div class="movie-list-item">
+                            <img class="movie-list-item-img" src=${item.Poster == 'N/A' ? 'video-camera.png' : item.Poster} alt=""/>
+                            <p class="movie-list-item-title">${item.Title}</p>
+                           
+                            <button class="movie-list-item-button" id=${item.imdbID
+                } onclick="getMoviesDetails(${item.imdbID})">Details</button>
+            
+    </div>
+        
+        `;
+        });
+        dataPanel.innerHTML = htmlContent;
+    }
+    // displayDataListModel(data);
+    searchBtn.addEventListener("click", event => {
+        event.preventDefault();
+        if (searchInput.value != '')
+            displayMoviesForPage(1);
+    });
+    displayMoviesForPage(1);
+
+</script>
+
+
+</html>
